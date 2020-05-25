@@ -12,23 +12,8 @@
     "output": "./dist/"
   },
   "npmRebuild": false,
-  "publish": [
-    {
+  "publish": {
       "provider": "github"
-    }
-  ],
-  "win": {
-    "target": [
-      "nsis",
-      "portable",
-      "appx"
-    ]
-  },
-  "nsis": {
-    "perMachine": true
-  },
-  "portable": {
-    "artifactName": "${productName}-${version}-portable.${ext}"
   },
   "mac": {
   	"hardenedRuntime": true,
@@ -52,8 +37,7 @@
     "target": [
       "AppImage",
       "deb",
-      "rpm",
-      "snap"
+      "rpm"
     ]
   },
   "fileAssociations": [

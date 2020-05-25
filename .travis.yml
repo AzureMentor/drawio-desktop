@@ -1,13 +1,13 @@
-osx_image: xcode10.2
+osx_image: xcode11.3
 
-dist: trusty
-sudo: false
+dist: bionic
 
 language: c
 
 matrix:
   include:
     - os: osx
+      osx_image: xcode11.3
     - os: linux
       env: CC=clang CXX=clang++ npm_config_clang=1
       compiler: clang
@@ -35,15 +35,20 @@ before_install:
   - sed -ie 's/git@github.com:/https:\/\/github.com\//' .gitmodules
   - git submodule update --init --recursive
   - npm install -g yarn
+  - if [ "$TRAVIS_OS_NAME" = "linux" ]; then echo $SNAP_TOKEN > /tmp/login_token_file; fi
 
 install:
   - nvm install 10
   - yarn install
+  - if [ "$TRAVIS_OS_NAME" = "linux" ]; then sudo snap install snapcraft --classic; fi
+  - if [ "$TRAVIS_OS_NAME" = "linux" ]; then snapcraft login --with /tmp/login_token_file; fi
 
 script:
   - yarn run sync
-  - yarn run release
-
+  - yarn run release-linux
+  - if [ "$TRAVIS_OS_NAME" = "linux" ]; then yarn run release-snap; fi
+  # Cannot configure electron-builder to publish to stable channel, so do it explicitly
+  - if [ "$TRAVIS_OS_NAME" = "linux" ]; then snapcraft push --release stable dist/draw.io-amd64-*.snap; fi
 branches:
   except:
     - "/^v\\d+\\.\\d+\\.\\d+$/"
